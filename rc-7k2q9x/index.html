@@ -44,6 +44,7 @@ ul{margin:8px 0 0 18px;padding:0}li{margin:4px 0}
 .pair{display:grid;grid-template-columns:110px 1fr;gap:8px;align-items:center;margin:10px 0;font-size:13px}
 .pair .bars div{height:14px;border-radius:4px;margin:2px 0;font-size:11px;line-height:14px;padding-left:6px;white-space:nowrap}
 svg text{fill:#9fb2c6;font-size:11px}
+@media(max-width:600px){svg text{font-size:17px}#simsvg{min-height:200px}}
 .sim{position:relative}.simtop{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
 .simdate{font-size:26px;font-weight:700}.simk{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
 .simk div{flex:1;min-width:130px;background:#0f2133;border:1px solid var(--line);border-radius:10px;padding:8px 10px}
@@ -113,7 +114,7 @@ footer{color:var(--mut);font-size:12px;margin-top:24px;text-align:center}
 </div>
 
 <div class="card note">
-<b>How we built this.</b> Your shipping file, January 2 to October 31, 2026 (273,203 labels), annualized. A parcel moves only when HTL's rate beats what you paid on it; everything else stays on your current carriers. Light parcel covers ground parcels up to 25 lb with the longest side up to 24 inches, delivered to ZIPs in our partner's network. Rates shown are base transportation rates; fuel and surcharges are not included on either side. All figures are estimates pending final partner rate confirmation.
+<b>How we built this.</b> Your shipping file, January 2 to October 31, 2026 (273,203 labels), annualized. A parcel moves only when HTL's rate beats what you paid on it; everything else stays on your current carriers. Light parcel covers ground parcels up to 25 lb with the longest side up to 30 inches, delivered to ZIPs in our partner's network. Rates shown are base transportation rates; fuel and surcharges are not included on either side. All figures are estimates pending final partner rate confirmation.
 </div>
 <footer>Hassan Transportation &amp; Logistics · Charlotte, NC · 610-731-3506 · Confidential, prepared for Savannah River Fulfillment</footer>
 </div>
@@ -144,14 +145,14 @@ D.forEach((d,i)=>{if(d[0].slice(8)=='01'||i==0)grid+=`<text x="${X(i)}" y="${H-8
 const svg=document.getElementById('simsvg');let i=0,t=null,sp=2;
 function path(a,k){let s='';for(let j=0;j<=k;j++)s+=(j?'L':'M')+X(j).toFixed(1)+','+Y(a[j]).toFixed(1);return s}
 function draw(k){const area=path(cc,k)+[...Array(k+1).keys()].reverse().map(j=>'L'+X(j).toFixed(1)+','+Y(ch[j]).toFixed(1)).join('')+'Z';
-svg.innerHTML=grid+`<path d="${area}" fill="#3ccf91" opacity=".25"/><path d="${path(cc,k)}" fill="none" stroke="#9fb8d3" stroke-width="2.5"/><path d="${path(ch,k)}" fill="none" stroke="#e6b04a" stroke-width="2.5"/>`+(k?`<circle cx="${X(k)}" cy="${Y(cc[k])}" r="4" fill="#9fb8d3"/><circle cx="${X(k)}" cy="${Y(ch[k])}" r="4" fill="#e6b04a"/><text x="${Math.min(X(k)+6,W-90)}" y="${(Y(cc[k])+Y(ch[k]))/2+4}" style="fill:#3ccf91;font-weight:700;font-size:13px">${k?'+'+f$(cc[k]-ch[k]):''}</text>`:'');
+svg.innerHTML=grid+`<path d="${area}" fill="#3ccf91" opacity=".25"/><path d="${path(cc,k)}" fill="none" stroke="#9fb8d3" stroke-width="2.5"/><path d="${path(ch,k)}" fill="none" stroke="#e6b04a" stroke-width="2.5"/>`+(k?`<circle cx="${X(k)}" cy="${Y(cc[k])}" r="4" fill="#9fb8d3"/><circle cx="${X(k)}" cy="${Y(ch[k])}" r="4" fill="#e6b04a"/><text x="${Math.min(X(k)+6,W-90)}" y="${(Y(cc[k])+Y(ch[k]))/2+4}" style="fill:#3ccf91;font-weight:700;font-size:15px">${k?'+'+f$(cc[k]-ch[k]):''}</text>`:'');
 $('#sd').textContent=fd(D[Math.max(k-1,0)][0]);$('#sn').textContent=cn[k].toLocaleString();$('#sc').textContent=f$(cc[k]);$('#sh').textContent=f$(ch[k]);$('#ss').textContent=f$(cc[k]-ch[k]);document.querySelector('#prog i').style.width=(k/N*100)+'%'}
 function stop(){clearInterval(t);t=null;$('#play').textContent=i>=N?'↺ Replay':'▶ Play'}
 function go(){if(i>=N)i=0;$('#play').textContent='❚❚ Pause';clearInterval(t);t=setInterval(()=>{i=Math.min(N,i+sp);draw(i);if(i>=N)stop()},70)}
 $('#play').onclick=()=>t?stop():go();
 document.querySelectorAll('.sbtn').forEach(b=>b.onclick=()=>{sp=+b.dataset.s;document.querySelectorAll('.sbtn').forEach(x=>x.classList.toggle('on',x==b))});
 $('#prog').onclick=e=>{const r=e.currentTarget.getBoundingClientRect();i=Math.round((e.clientX-r.left)/r.width*N);draw(i)};
-draw(0);if('IntersectionObserver' in window){const o=new IntersectionObserver(es=>{if(es[0].isIntersecting){o.disconnect();setTimeout(go,600)}},{threshold:.4});o.observe(document.getElementById('simcard'))}})();
+window.__sim=draw;draw(0);if(!window.__noauto&&'IntersectionObserver' in window){const o=new IntersectionObserver(es=>{if(es[0].isIntersecting){o.disconnect();setTimeout(go,600)}},{threshold:.2});o.observe(document.getElementById('simcard'))}})();
 let mode='cmp';
 function draw(){let h='<tr><th>Weight</th>'+[1,2,3,4,5,6,7,8].map(z=>`<th>Zone ${z}</th>`).join('')+'</tr>';
 D.forEach((row,w)=>{h+=`<tr><td class="w">${w==0?'Under 1 lb':w+' lb'}</td>`;row.forEach(c=>{const[ht,cu]=c;const p=(ht!=null&&cu!=null)?Math.round((1-ht/cu)*100):null;let t='—';
